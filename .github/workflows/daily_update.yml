@@ -1,0 +1,32 @@
+name: Borsa Verilerini Güncelle
+
+on:
+  schedule:
+    - cron: '0 15 * * 1-5' # Hafta içi her gün TSİ 18:00'de çalışır (Borsa kapanışı)
+  workflow_dispatch: # Manuel çalıştırmak istersen buton çıkarır
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları çek
+        uses: actions/checkout@v3
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Kütüphaneleri Yükle
+        run: pip install yfinance
+
+      - name: Botu Çalıştır
+        run: python bot.py
+
+      - name: Değişiklikleri Kaydet ve Pushla
+        run: |
+          git config --global user.name 'GitHub Action Bot'
+          git config --global user.email 'action@github.com'
+          git add src/App.jsx
+          git commit -m "Otomatik borsa fiyat güncellemesi" || echo "Değişiklik yok"
+          git push
