@@ -19,7 +19,7 @@ import {
   Save,
   Star
 } from 'lucide-react';
-
+const lastUpdated = '06.05.2026 18:45'; // Bot burayı otomatik değiştirecek
 // ============================================================================
 // 📁 src/utils/dateUtils.js
 // ============================================================================
@@ -859,6 +859,9 @@ export default function App() {
           <div className="text-xs text-emerald-500 font-medium tracking-wider uppercase border border-emerald-900 bg-emerald-950/50 px-3 py-1 rounded-full flex items-center gap-1">
             <Briefcase size={12} /> PRO Sürüm
           </div>
+          <p className="text-xs text-slate-500 mt-1">
+  Son Güncelleme: {lastUpdated} (Otomatik)
+</p>
         </div>
       </header>
 

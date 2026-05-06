@@ -4,6 +4,12 @@ import os
 
 def update_app_jsx():
     file_path = 'src/App.jsx'
+    # Türkiye saatini baz alarak zaman damgası oluştur
+    now = datetime.datetime.now()
+    # App.jsx içinde "lastUpdated: '...'" şeklinde bir yer arayıp günceller
+    timestamp = now.strftime("%d.%m.%Y %H:%M")
+    pattern_time = r"(lastUpdated:\s*')[^']*"
+    content = re.sub(pattern_time, r"\g<1>" + timestamp, content)
     
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()

@@ -2,20 +2,22 @@ name: Borsa Verilerini Güncelle
 
 on:
   schedule:
-    - cron: '0 15 * * 1-5' # Hafta içi her gün TSİ 18:00'de çalışır (Borsa kapanışı)
-  workflow_dispatch: # Manuel çalıştırmak istersen buton çıkarır
+    - cron: '0 15 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: # Buraya da yetki ekleyerek işimizi garantiye alalım
+      contents: write
     steps:
       - name: Kodları çek
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # v3 yerine v4 yaptık
 
       - name: Python Kur
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # v4 yerine v5 yaptık
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Kütüphaneleri Yükle
         run: pip install yfinance
