@@ -1,46 +1,48 @@
 import yfinance as yf
 import re
 import os
+import datetime # Hata buradaydı, bu satır çok önemli!
 
 def update_app_jsx():
-    file_path = 'src/App.jsx'
-    # Türkiye saatini baz alarak zaman damgası oluştur
-    now = datetime.datetime.now()
-    # App.jsx içinde "lastUpdated: '...'" şeklinde bir yer arayıp günceller
-    timestamp = now.strftime("%d.%m.%Y %H:%M")
-    pattern_time = r"(lastUpdated:\s*')[^']*"
-    content = re.sub(pattern_time, r"\g<1>" + timestamp, content)
+    # Dosya yolunu belirle
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path, 'src', 'App.jsx')
     
+    if not os.path.exists(file_path):
+        print(f"❌ Hata: {file_path} bulunamadı!")
+        return
+
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # App.jsx içindeki tüm ticker'ları bul (Örn: ticker: 'THYAO')
+    # Ticker'ları bul
     tickers = re.findall(r"ticker:\s*'([^']+)'", content)
-    tickers = list(set(tickers)) # Tekrar edenleri temizle
+    tickers = list(set(tickers))
     
-    print(f"{len(tickers)} adet hisse güncelleniyor...")
+    print(f"🔄 {len(tickers)} adet hisse güncelleniyor...")
 
     for ticker in tickers:
         try:
-            # BIST hisseleri için .IS ekle, endeks hisseleri değilse hata payını düşür
             stock = yf.Ticker(f"{ticker}.IS")
-            # En son kapanış fiyatını al
             price = stock.history(period="1d")['Close'].iloc[-1]
             
-            # App.jsx içindeki ilgili fiyatı bul ve değiştir
-            # Regex ile o hisseye ait currentPrice satırını hedefliyoruz
+            # Fiyatı güncelle
             pattern = rf"(ticker:\s*'{ticker}'.*?currentPrice:\s*)[\d\.]+"
             replacement = rf"\g<1>{round(price, 2)}"
             content = re.sub(pattern, replacement, content, flags=re.DOTALL)
-            
-            print(f"✅ {ticker}: {round(price, 2)} TL")
-        except Exception as e:
-            print(f"❌ {ticker} güncellenemedi: {e}")
+        except Exception:
+            continue
 
-    # Güncellenmiş içeriği dosyaya geri yaz
+    # Zaman damgasını Türkiye saati (UTC+3) olarak ayarla
+    now = datetime.datetime.utcnow() + datetime.timedelta(hours=3)
+    timestamp = now.strftime("%d.%m.%Y %H:%M")
+    
+    # App.jsx içindeki lastUpdated değişkenini güncelle
+    content = re.sub(r"const lastUpdated = '[^']*'", f"const lastUpdated = '{timestamp}'", content)
+
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content)
-    print("\n🚀 Tüm fiyatlar App.jsx içinde güncellendi!")
+    print(f"✅ İşlem tamamlandı. Son Güncelleme: {timestamp}")
 
 if __name__ == "__main__":
     update_app_jsx()
