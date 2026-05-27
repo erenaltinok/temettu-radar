@@ -19,7 +19,7 @@ import {
   Save,
   Star
 } from 'lucide-react';
-const lastUpdated = '26.05.2026 20:54'; // Bot burayı otomatik değiştirecek
+const lastUpdated = '27.05.2026 20:56'; // Bot burayı otomatik değiştirecek
 // ============================================================================
 // 📁 src/utils/dateUtils.js
 // ============================================================================
